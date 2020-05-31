@@ -1,3 +1,6 @@
+const admin = require('./admin')
+
+
 module.exports = app => {
 
     app.post('/signup', app.api.user.save)
@@ -7,36 +10,48 @@ module.exports = app => {
     app.post('/validateToken', app.api.auth.validateToken)
 
     app.route('/users')
+        .all(app.config.passport.authenticate())
         .post(app.api.user.save)
-        .get(app.api.user.get)
+        .get(admin(app.api.user.get))
 
     app.route('/users/:id')
+        .all(app.config.passport.authenticate())
         .put(app.api.user.save)
-        .get(app.api.user.getById)
+        .get(admin(app.api.user.getById))
 
     app.route('/categories')
-        .get(app.api.category.get)
-        .post(app.api.category.save)
+        .all(app.config.passport.authenticate())
+        .get(admin(app.api.category.get))
+        .post(admin(app.api.category.save))
 
     // Cuidado com a ordem! Tem que vir antes de /categories/:id
     app.route('/categories/:id')
+        .all(app.config.passport.authenticate())
         .get(app.api.category.getTree)
 
     app.route('/categories/:id')
+        .all(app.config.passport.authenticate())
         .put(app.api.category.save)
         .get(app.api.category.getById)
         .delete(app.api.category.remove)
     
     
     app.route('/articles')
+        .all(app.config.passport.authenticate())
         .get(app.api.article.get)
         .post(app.api.article.save)
 
     app.route('/articles/:id')
-        .put(app.api.article.save)
+        .all(app.config.passport.authenticate())
+        .put(admin(app.api.article.save))
         .get(app.api.article.getById)
-        .delete(app.api.article.remove)
+        .delete(admin(app.api.article.remove))
 
     app.route('/categories/:id/articles')
+        .all(app.config.passport.authenticate())
         .get(app.api.article.getByCategory)
+
+    app.route('/stats')
+        .all(app.config.passport.authenticate())
+        .get(app.api.stat.get)        
 }
