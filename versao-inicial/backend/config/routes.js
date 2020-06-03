@@ -11,13 +11,16 @@ module.exports = app => {
 
     app.route('/users')
         .all(app.config.passport.authenticate())
-        .post(app.api.user.save)
+        .post(admin(app.api.user.save))
         .get(admin(app.api.user.get))
+        // .get(app.api.user.get)
 
     app.route('/users/:id')
         .all(app.config.passport.authenticate())
-        .put(app.api.user.save)
+        .put(admin(app.api.user.save))
         .get(admin(app.api.user.getById))
+        .delete(admin(app.api.user.remove))
+        // .delete(app.api.user.remove)
 
     app.route('/categories')
         .all(app.config.passport.authenticate())
