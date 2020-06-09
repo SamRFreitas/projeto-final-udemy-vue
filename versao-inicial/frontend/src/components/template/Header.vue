@@ -76,5 +76,6 @@ export default {
     header.header > a.toggle:hover {
         color: #FFF;
         background-color: rgba(0, 0, 0, 0.2);
+        cursor: pointer;
     }
 </style>
