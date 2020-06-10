@@ -54,6 +54,7 @@
             </b-row>
             
         </b-form>
+
         <b-table hover striped :items="users" :fields="fields" class="mt-3">
             <template slot="actions" slot-scope="data" >  
                 <b-button variant="warning" @click="loadUser(data.item)" class="mr-2">
@@ -65,6 +66,7 @@
                 </b-button>
             </template>
         </b-table>
+        
     </div>
 </template>
 
