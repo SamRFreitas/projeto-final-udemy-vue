@@ -4,7 +4,7 @@
             :main="category.name" sub="Categoria" />
         <ul>
             <li v-for="article in articles" :key="article.id">
-                {{ article.name }}
+                <ArticleItem :article="article"/>
             </li>
         </ul>
 
@@ -22,10 +22,12 @@
 import { baseApiUrl } from '@/global.js'
 import axios from 'axios'
 import PageTitle from '../template/PageTitle'
+import ArticleItem from './ArticleItem'
 export default {
     name: 'ArticlesByCategory',
     components: {
-        PageTitle
+        PageTitle,
+        ArticleItem
     },
     data() {
         return {
@@ -50,6 +52,17 @@ export default {
             })
         }
     }, 
+    watch: {
+        $route(to) {
+            this.category.id = to.params.id
+            this.articles = []
+            this.page = 1
+            this.loadMore = true
+
+            this.getCategory()
+            this.getArticles()
+        }
+    },
     mounted() {
         this.category.id = this.$route.params.id
         this.getCategory()

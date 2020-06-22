@@ -1,9 +1,9 @@
 <template>
-	<div id="app" :class="{'hide-menu' : !isMenuVisible}">
+	<div id="app" :class="{'hide-menu' : !isMenuVisible || !user}">
 		<Header title="Cod3r - Base de Conhecimento" 
-			:hideToggle="false"
-			:hideUserDropDown="false" />
-		<Menu/>
+			:hideToggle="!user"
+			:hideUserDropDown="!user" />
+		<Menu v-if="user" />
 		<Content/>
 		<Footer/>
 	</div>
