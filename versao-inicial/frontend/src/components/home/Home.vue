@@ -31,7 +31,6 @@ export default {
     data() {
         return {
             stat: {},
-            reste: 'asas'
         }
     },
     methods: {

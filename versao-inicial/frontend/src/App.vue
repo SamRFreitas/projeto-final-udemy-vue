@@ -1,24 +1,67 @@
 <template>
-	<div id="app" :class="{'hide-menu' : !isMenuVisible || !user}">
+	<div id="app" :class="{'hide-menu': !isMenuVisible || !user}">
 		<Header title="Cod3r - Base de Conhecimento" 
 			:hideToggle="!user"
-			:hideUserDropDown="!user" />
+			:hideUserDropdown="!user" />
 		<Menu v-if="user" />
-		<Content/>
-		<Footer/>
+		<Loading v-if="validatingToken" />
+		<Content v-else />
+		<Footer />
 	</div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
-import Header from './components/template/Header'
-import Menu from './components/template/Menu'
-import Content from './components/template/Content'
-import Footer from './components/template/Footer'
+import axios from "axios"
+import { baseApiUrl, userKey } from "@/global"
+import { mapState } from "vuex"
+import Header from "@/components/template/Header"
+import Menu from "@/components/template/Menu"
+import Content from "@/components/template/Content"
+import Footer from "@/components/template/Footer"
+import Loading from "@/components/template/Loading"
+
 export default {
 	name: "App",
-	components: { Header, Menu, Content, Footer },
-	computed: mapState(['isMenuVisible'])
+	components: { Header, Menu, Content, Footer, Loading },
+	computed: mapState(['isMenuVisible', 'user']),
+	data: function() {
+		return {
+			validatingToken: true
+		}
+	},
+	methods: {
+		async validateToken() {
+			this.validatingToken = true
+
+			const json = localStorage.getItem(userKey)
+			const userData = JSON.parse(json)
+			this.$store.commit('setUser', null)
+
+			if(!userData) {
+				this.validatingToken = false
+				this.$router.push({ name: 'auth' })
+				return
+			}
+
+			const res = await axios.post(`${baseApiUrl}/validateToken`, userData)
+
+			if (res.data) {
+				this.$store.commit('setUser', userData)
+				
+				if(this.$mq === 'xs' || this.$mq === 'sm') {
+					this.$store.commit('toggleMenu', false)
+				}
+			} else {
+				localStorage.removeItem(userKey)
+				this.$router.push({ name: 'auth' })
+			}
+
+			this.validatingToken = false
+		}
+	},
+	created() {
+		this.validateToken()
+	}
 }
 </script>
 
@@ -32,53 +75,23 @@ export default {
 	}
 
 	#app {
-		-webkit-web-smoothing: antialiased;
+		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
 
 		height: 100vh;
 		display: grid;
 		grid-template-rows: 60px 1fr 40px;
 		grid-template-columns: 300px 1fr;
-		grid-template-areas:  
+		grid-template-areas:
 			"header header"
 			"menu content"
-			"menu footer" 
-	}
-
-	.title {
-		font-size: 1.2rem;
-		color: #fff;
-		font-weight: 100;
-		flex-grow: 1;
-		text-align: center;
-	}
-
-	.title a {
-		color: #fff;
-		text-decoration: none;
-	}
-
-	header.header > a.toggle {
-		width: 60px;
-		height: 100%;
-		color: #fff;
-		justify-self: flex-start;
-		text-decoration: none;
-
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	header.header > a.toggle:hover {
-		background-color: rgba(0, 0, 0, 0.2);
+			"menu footer";
 	}
 
 	#app.hide-menu {
-		grid-template-areas:  
+		grid-template-areas:
 			"header header"
 			"content content"
-			"footer footer"
+			"footer footer";
 	}
-
 </style>
